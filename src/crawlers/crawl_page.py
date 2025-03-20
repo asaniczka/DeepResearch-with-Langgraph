@@ -7,6 +7,8 @@ import httpx
 from dotenv import load_dotenv
 from wrapworks import cwdtoenv
 
+from src.models.research_models import PageCrawlResult
+
 cwdtoenv()
 load_dotenv()
 
@@ -15,7 +17,7 @@ from src.errors.main_errors import NoPageFetched
 LOGGER = logging.getLogger(__name__)
 
 
-def get_page(url: str) -> tuple[str, str]:
+def get_page(url: str) -> PageCrawlResult | None:
 
     retries = 0
     while retries < 2:
@@ -32,15 +34,13 @@ def get_page(url: str) -> tuple[str, str]:
                 timeout=30,
             )
 
-            if api_response.status_code == 429:
-                raise RuntimeError("Ratelimit on Zyte")
-
             api_response.raise_for_status()
-
             browser_html: str = api_response.json()["browserHtml"]
+            return PageCrawlResult(url=url, page=browser_html)
 
-            return browser_html, url
         except httpx.HTTPStatusError as e:
+            if e.response.status_code == 429:
+                raise RuntimeError("Ratelimit on Zyte")
             LOGGER.error(
                 f"Http status error {e.response.status_code}: {e.response.text}"
             )
@@ -48,3 +48,5 @@ def get_page(url: str) -> tuple[str, str]:
         except (RuntimeError, httpx.ConnectError):
             retries += 1
             time.sleep(5)
+
+    return None

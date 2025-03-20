@@ -6,3 +6,8 @@ class SerpResult(BaseModel):
     title: str
     description: str
     rank: int
+
+
+class PageCrawlResult(BaseModel):
+    url: str
+    page: str
