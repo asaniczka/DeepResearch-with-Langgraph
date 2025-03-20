@@ -5,9 +5,14 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "bs4>=0.0.2",
+    "httpx>=0.28.1",
     "langgraph>=0.3.18",
     "openai>=1.67.0",
     "pydantic>=2.10.6",
+    "pytest>=8.3.5",
+    "python-dotenv>=1.0.1",
+    "wrapworks>=1.0.8",
 ]
 
 [dependency-groups]
