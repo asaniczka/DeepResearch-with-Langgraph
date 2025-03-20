@@ -2,11 +2,10 @@
 import logging
 import os
 import time
-from urllib.parse import quote
 
 import httpx
 from dotenv import load_dotenv
-from wrapworks import cwdtoenv, dump_text
+from wrapworks import cwdtoenv
 
 cwdtoenv()
 load_dotenv()
@@ -49,16 +48,3 @@ def get_page(url: str) -> tuple[str, str]:
         except (RuntimeError, httpx.ConnectError):
             retries += 1
             time.sleep(5)
-
-
-def get_serp(query: str) -> list:
-
-    base_url = "https://www.google.com/search?client=firefox-b-lm&channel=entpr&q="
-    full_url = base_url + quote(query)
-
-    page, _ = get_page(full_url)
-    dump_text("tests/fixtures/google_serp.html", page)
-
-
-if __name__ == "__main__":
-    get_serp("AI Tools")
