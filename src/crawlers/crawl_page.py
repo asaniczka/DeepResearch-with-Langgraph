@@ -40,12 +40,15 @@ def get_page(url: str) -> PageCrawlResult | None:
 
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 429:
-                raise RuntimeError("Ratelimit on Zyte")
+                retries += 1
+                time.sleep(5)
+                continue
+
             LOGGER.error(
                 f"Http status error {e.response.status_code}: {e.response.text}"
             )
             raise NoPageFetched("Unable to fetch page") from e
-        except (RuntimeError, httpx.ConnectError):
+        except httpx.ConnectError:
             retries += 1
             time.sleep(5)
 
