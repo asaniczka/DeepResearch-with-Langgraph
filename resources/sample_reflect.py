@@ -58,6 +58,8 @@ builder.add_conditional_edges(GENERATE, should_continue)
 builder.add_edge(REFLECT, GENERATE)
 
 graph = builder.compile()
-print(graph.get_graph().draw_mermaid())
 if __name__ == "__main__":
-    print(reflection_node([]))
+    print(graph.get_graph().draw_mermaid())
+
+    res = graph.invoke(HumanMessage(content="I'm new to twitter. Not liking it so far"))
+    print(res)
