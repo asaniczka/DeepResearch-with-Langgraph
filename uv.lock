@@ -641,6 +641,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pytest" },
     { name = "python-dotenv" },
+    { name = "rich" },
     { name = "wrapworks" },
 ]
 
@@ -663,6 +664,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.10.6" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
+    { name = "rich", specifier = ">=13.9.4" },
     { name = "wrapworks", specifier = ">=1.0.8" },
 ]
 
