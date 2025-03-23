@@ -76,9 +76,12 @@ def invoke_tools(state: Sequence[BaseMessage]) -> list:
 def what_to_do(state: list[BaseMessage]) -> str:
 
     last_message: AIMessage = state[-1]
-    parsed_message: SearchQueries = parser_pydantic.invoke(last_message)[0]
+    try:
+        parsed_message: SearchQueries = parser_pydantic.invoke(last_message)[0]
+    except ValueError:
+        return ESSAY_WRITER
 
-    if len(state) > 10 or parsed_message.no_missing_info:
+    if len(state) > 20 or parsed_message.no_missing_info:
         return ESSAY_WRITER
 
     return ONLINE_SEARCH
@@ -111,7 +114,7 @@ if __name__ == "__main__":
 
     graph = builder.compile()
     res = graph.invoke(
-        "List out all tools,frameworks, langauges used by data engineers at atlassian"
+        "Working as a data engineer at airbnb and atlassian, what parts of scala and java should one learn to be a Senior DE. List everything"
     )
 
     print(res)
