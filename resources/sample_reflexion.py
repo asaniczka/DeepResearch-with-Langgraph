@@ -1,11 +1,13 @@
+import json
 from typing import Sequence
 
 from langchain.tools import Tool
 from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 from langchain_openai.output_parsers import JsonOutputToolsParser, PydanticToolsParser
+from langgraph.graph import END, MessageGraph
 from pydantic import BaseModel
 from rich import print
 
@@ -36,7 +38,8 @@ essay_generator_template = ChatPromptTemplate(
         (
             "system",
             "Based on the provided info, please write a detailed response to the user on the requested topic. You'll see multiple chat messages, these are info provided by different agents to help to write the final answer",
-        )
+        ),
+        MessagesPlaceholder(variable_name="messages"),
     ]
 )
 
@@ -48,26 +51,43 @@ def travality_search(query: str):
 
 
 travily_executor = Tool(name="", description="", func=travality_search)
-topic_analyser = "topic_analyser"
-ESSAY = "essay"
+TOPIC_ANALYSER = "topic_analyser"
+ESSAY_WRITER = "essay_writer"
+ONLINE_SEARCH = "online_search"
+MAX_ITERATIONS = 2
 
 
-def invoke_tools(state: Sequence[BaseMessage]):
+def invoke_tools(state: Sequence[BaseMessage]) -> list:
 
     tool_requests: AIMessage = state[-1]
+    print(tool_requests)
     parsed_tool_calls = parser_json.invoke(tool_requests)
 
+    call_id = tool_requests.additional_kwargs["tool_calls"][0]["id"]
     queries = []
     for tool_call in parsed_tool_calls:
         for query in tool_call["args"]["search_queries"]:
             queries.append(query)
 
-    return travily_executor.batch(queries)
+    results = travily_executor.batch(queries)
+    return ToolMessage(content=json.dumps(results), tool_call_id=call_id)
 
 
-def what_to_do(state: Sequence[BaseMessage]) -> str:
+def what_to_do(state: list[BaseMessage]) -> str:
 
-    return ESSAY
+    last_message: AIMessage = state[-1]
+    parsed_message: SearchQueries = parser_pydantic.invoke(last_message)[0]
+
+    if len(state) > 5 or parsed_message.no_missing_info:
+        state.append(
+            ToolMessage(
+                content="Not available",
+                tool_call_id=last_message.additional_kwargs["tool_calls"][0]["id"],
+            )
+        )
+        return ESSAY_WRITER
+
+    return ONLINE_SEARCH
 
 
 topic_analyser = topic_analyser_template | llm.bind_tools(
@@ -75,12 +95,27 @@ topic_analyser = topic_analyser_template | llm.bind_tools(
 )
 essay_writer = essay_generator_template | llm
 
+
+builder = MessageGraph()
+builder.add_node(TOPIC_ANALYSER, topic_analyser)
+builder.add_node(ONLINE_SEARCH, invoke_tools)
+builder.add_node(ESSAY_WRITER, essay_writer)
+builder.set_entry_point(TOPIC_ANALYSER)
+builder.add_conditional_edges(TOPIC_ANALYSER, what_to_do)
+builder.add_edge(ONLINE_SEARCH, TOPIC_ANALYSER)
+builder.add_edge(ESSAY_WRITER, END)
+
+
 if __name__ == "__main__":
     human_message = HumanMessage(
         content="THE TOPIC I WANT INFO ABOUT is: What is Databricks and what are some opensource alternatives to it"
     )
 
-    res = topic_analyser.invoke({"messages": [human_message]})
+    print(builder.compile().get_graph().draw_mermaid())
+
+    graph = builder.compile()
+    res = graph.invoke(
+        "THE TOPIC I WANT INFO ABOUT is: What is Databricks and what are some opensource alternatives to it"
+    )
+
     print(res)
-    r2 = invoke_tools([res])
-    print(r2)
