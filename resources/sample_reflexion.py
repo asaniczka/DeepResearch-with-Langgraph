@@ -3,7 +3,7 @@ from typing import Sequence
 
 from langchain.tools import Tool
 from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
+from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 from langchain_openai.output_parsers import JsonOutputToolsParser, PydanticToolsParser
@@ -78,22 +78,21 @@ def what_to_do(state: list[BaseMessage]) -> str:
     last_message: AIMessage = state[-1]
     parsed_message: SearchQueries = parser_pydantic.invoke(last_message)[0]
 
-    if len(state) > 5 or parsed_message.no_missing_info:
-        state.append(
-            ToolMessage(
-                content="Not available",
-                tool_call_id=last_message.additional_kwargs["tool_calls"][0]["id"],
-            )
-        )
+    if len(state) > 10 or parsed_message.no_missing_info:
         return ESSAY_WRITER
 
     return ONLINE_SEARCH
 
 
+def state_cleaner(state: list[BaseMessage]) -> list[BaseMessage]:
+    state.pop()
+    return state
+
+
 topic_analyser = topic_analyser_template | llm.bind_tools(
     tools=[SearchQueries], tool_choice="SearchQueries"
 )
-essay_writer = essay_generator_template | llm
+essay_writer = state_cleaner | essay_generator_template | llm
 
 
 builder = MessageGraph()
@@ -107,15 +106,12 @@ builder.add_edge(ESSAY_WRITER, END)
 
 
 if __name__ == "__main__":
-    human_message = HumanMessage(
-        content="THE TOPIC I WANT INFO ABOUT is: What is Databricks and what are some opensource alternatives to it"
-    )
 
     print(builder.compile().get_graph().draw_mermaid())
 
     graph = builder.compile()
     res = graph.invoke(
-        "THE TOPIC I WANT INFO ABOUT is: What is Databricks and what are some opensource alternatives to it"
+        "List out all tools,frameworks, langauges used by data engineers at atlassian"
     )
 
     print(res)
