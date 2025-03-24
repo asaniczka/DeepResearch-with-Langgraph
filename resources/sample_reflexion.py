@@ -18,7 +18,7 @@ class SearchQueries(BaseModel):
     no_missing_info: bool
 
 
-llm = ChatOpenAI(model="gpt-4o")
+llm = ChatOpenAI(model="o3-mini")
 parser_json = JsonOutputToolsParser()
 parser_pydantic = PydanticToolsParser(tools=[SearchQueries])
 
@@ -60,7 +60,6 @@ MAX_ITERATIONS = 2
 def invoke_tools(state: Sequence[BaseMessage]) -> list:
 
     tool_requests: AIMessage = state[-1]
-    print(tool_requests)
     parsed_tool_calls = parser_json.invoke(tool_requests)
 
     call_id = tool_requests.additional_kwargs["tool_calls"][0]["id"]
@@ -113,8 +112,5 @@ if __name__ == "__main__":
     print(builder.compile().get_graph().draw_mermaid())
 
     graph = builder.compile()
-    res = graph.invoke(
-        "Working as a data engineer at airbnb and atlassian, what parts of scala and java should one learn to be a Senior DE. List everything"
-    )
-
-    print(res)
+    for event in graph.stream("Best items at pizza hut"):
+        print(event)
