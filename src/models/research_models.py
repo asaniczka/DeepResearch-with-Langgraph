@@ -11,3 +11,7 @@ class SerpResult(BaseModel):
 class PageCrawlResult(BaseModel):
     url: str
     page: str
+
+
+class SearchQueries(BaseModel):
+    search_queries: list[str]
