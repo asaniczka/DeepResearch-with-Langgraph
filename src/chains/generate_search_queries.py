@@ -1,34 +1,35 @@
 from langchain.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
+from pydantic import BaseModel
 
 LLM = ChatOpenAI(model="o3-mini")
 
-SUMMERIZE_PAGE_PROMPT = ChatPromptTemplate.from_messages(
+
+class SearchQueries(BaseModel):
+    search_queries: list[str]
+
+
+SEARCH_QUERY_GENERATOR = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            "You are page summerizer for a researcher. You'll be provided with the markdown page and the target information to extract in the summerizations. Reply back with a full summary and don't exclude any requried info. Maintain any related or important urls. Include citations",
+            "You are a google search query generator. When provided with a information goal, your task is to reply with 3-5 queries that would"
+            " help discover information related to the infromation goal. A different agent willl go, search, and extract information based on"
+            " queries provided by you. Each query shoudl not contain more than 3-6 words",
         ),
-        ("user", "Here is what to focus on the summerization: {summarization_target}"),
-        ("user", "{page}"),
-    ]
-)
-
-
-SUMMERIZER_CHAIN = SUMMERIZE_PAGE_PROMPT | LLM | StrOutputParser
-
-
-SUMMERIZE_GROUP_PROMPT = ChatPromptTemplate.from_messages(
-    [
         (
-            "system",
-            "You are a summary aggregrator. You'll be provided with a few summaries created by different agent all with the goal of extracting certain information. Your task is to aggregate those summaries into one reseach document. Reply back with a full summary and don't exclude any requried info. Maintain any related or important urls. Include citations",
+            "user",
+            "Here is what to focus on the query generation: {summarization_target}",
         ),
-        ("user", "Here is what to focus on the summerization: {summarization_target}"),
-        ("user", "{all_pages}"),
     ]
 )
 
+STRUCTURED_LLM = LLM.with_structured_output(SearchQueries, method="json_schema")
+SUMMERIZER_CHAIN = SEARCH_QUERY_GENERATOR | STRUCTURED_LLM
 
-GROUP_SUMMERIZER_CHAIN = SUMMERIZE_GROUP_PROMPT | LLM | StrOutputParser
+
+if __name__ == "__main__":
+    from rich import print
+
+    res = SUMMERIZER_CHAIN.invoke({"summarization_target": "What is DBT used for"})
+    print(res)
