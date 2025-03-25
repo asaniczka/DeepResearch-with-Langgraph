@@ -7,12 +7,11 @@ from dotenv import load_dotenv
 from langchain_core.runnables import chain
 from wrapworks import cwdtoenv
 
-from src.models.research_models import PageCrawlResult
-
 cwdtoenv()
 load_dotenv()
 
 from src.errors.main_errors import NoPageFetched
+from src.models.research_models import PageCrawlResult
 
 LOGGER = logging.getLogger(__name__)
 

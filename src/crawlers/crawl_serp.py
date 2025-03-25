@@ -20,7 +20,7 @@ def get_serp(query: str) -> dict:
     base_url = "https://www.google.com/search?client=firefox-b-lm&channel=entpr&q="
     full_url = base_url + quote(query)
 
-    page = get_page(full_url)
+    page = get_page.invoke({"url": full_url})
     return page
 
 
