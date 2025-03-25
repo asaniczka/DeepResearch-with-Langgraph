@@ -1,10 +1,12 @@
 from bs4 import BeautifulSoup
+from langchain_core.runnables import chain
 from wrapworks import cwdtoenv
 
 cwdtoenv()
 from src.models.research_models import SerpResult
 
 
+@chain
 def parse_serp_page(page: str) -> list[SerpResult]:
 
     soup = BeautifulSoup(page, "html.parser")

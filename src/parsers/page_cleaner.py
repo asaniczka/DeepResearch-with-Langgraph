@@ -1,9 +1,12 @@
 from bs4 import BeautifulSoup
+from langchain_core.runnables import chain
 from markdownify import markdownify as md
 
 
-def clean_html(page: str) -> str:
+@chain
+def clean_html(state: dict) -> str:
 
+    page = state["page"]
     soup = BeautifulSoup(page, "html.parser")
 
     tags_to_remove = {"header", "script", "style", "nav", "footer", "img"}
@@ -11,7 +14,8 @@ def clean_html(page: str) -> str:
         for el in soup.find_all(tag):
             el.decompose()
 
-    return md(soup.prettify())
+    state["page"] = md(soup.prettify())
+    return state
 
 
 if __name__ == "__main__":
