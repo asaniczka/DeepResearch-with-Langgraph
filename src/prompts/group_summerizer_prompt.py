@@ -1,9 +1,4 @@
 from langchain.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_openai import ChatOpenAI
-
-LLM = ChatOpenAI(model="o3-mini")
-
 
 SUMMERIZE_GROUP_PROMPT = ChatPromptTemplate.from_messages(
     [
@@ -15,6 +10,3 @@ SUMMERIZE_GROUP_PROMPT = ChatPromptTemplate.from_messages(
         ("user", "{all_pages}"),
     ]
 )
-
-
-GROUP_SUMMERIZER_CHAIN = SUMMERIZE_GROUP_PROMPT | LLM | StrOutputParser

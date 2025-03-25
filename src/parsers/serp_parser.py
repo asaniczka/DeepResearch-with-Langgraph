@@ -7,8 +7,9 @@ from src.models.research_models import SerpResult
 
 
 @chain
-def parse_serp_page(page: str) -> list[SerpResult]:
+def parse_serp_page(state: dict) -> list[SerpResult]:
 
+    page = state["page"]
     soup = BeautifulSoup(page, "html.parser")
 
     serp_items = soup.select("div.asEBEc")
