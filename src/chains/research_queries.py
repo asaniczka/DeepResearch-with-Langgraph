@@ -1,4 +1,5 @@
-from langchain_core.output_parsers import StrOutputParser
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
+from langchain_core.runnables.passthrough import RunnablePick
 from langchain_openai import ChatOpenAI
 from wrapworks import cwdtoenv
 
@@ -17,7 +18,12 @@ LLM = ChatOpenAI(model="o3-mini")
 
 
 STRUCTURED_LLM = LLM.with_structured_output(SearchQueries, method="json_schema")
-QUERY_GENERATOR_CHAIN = SEARCH_QUERY_GENERATOR | STRUCTURED_LLM
+QUERY_GENERATOR_CHAIN = (
+    SEARCH_QUERY_GENERATOR
+    | STRUCTURED_LLM
+    | JsonOutputParser()
+    | RunnablePick(keys="search_queries")
+)
 
 GET_SERP_CHAIN = get_serp | parse_serp_page
 
