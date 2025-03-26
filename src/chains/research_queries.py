@@ -27,7 +27,7 @@ QUERY_GENERATOR_CHAIN = (
 )
 
 GET_SERP_CHAIN = (
-    get_serp | parse_serp_page | RunnableLambda(lambda x: [y.url for y in x[:3]])
+    get_serp | parse_serp_page | RunnableLambda(lambda x: [y.url for y in x[:2]])
 )
 
 PAGE_SUMMARY_CHAIN = (
@@ -40,23 +40,30 @@ GROUP_SUMMARY_CHAIN = SUMMERIZE_GROUP_PROMPT | LLM | StrOutputParser()
 @chain
 def get_research(summarization_target: str) -> str:
 
-    queries = QUERY_GENERATOR_CHAIN.invoke(
-        {"summarization_target": summarization_target}
-    )
+    try:
+        queries = QUERY_GENERATOR_CHAIN.invoke(
+            {"summarization_target": summarization_target}
+        )
 
-    serps = GET_SERP_CHAIN.batch(queries)
+        serps = GET_SERP_CHAIN.batch(queries)
 
-    page_urls = []
-    for x in serps:
-        page_urls.extend(x)
+        page_urls = []
+        for x in serps:
+            page_urls.extend(x)
 
-    summaries = PAGE_SUMMARY_CHAIN.batch(
-        [{"url": x, "summarization_target": summarization_target} for x in page_urls]
-    )
-    group_summary = GROUP_SUMMARY_CHAIN.invoke(
-        {"summarization_target": summarization_target, "all_pages": summaries}
-    )
-    return group_summary
+        summaries = PAGE_SUMMARY_CHAIN.batch(
+            [
+                {"url": x, "summarization_target": summarization_target}
+                for x in page_urls
+            ]
+        )
+        group_summary = GROUP_SUMMARY_CHAIN.invoke(
+            {"summarization_target": summarization_target, "all_pages": summaries}
+        )
+        return group_summary
+    except Exception as e:
+        print(type(e), e)
+        return f"Chain Failed with type e {type(e)} and e: {e}"
 
 
 if __name__ == "__main__":

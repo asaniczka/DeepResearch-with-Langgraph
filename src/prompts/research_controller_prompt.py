@@ -4,11 +4,13 @@ RESEARCH_CONTROLLER_PROMPT = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            "You are a deep research agent. Your task is to look at the provided topic and suggest relevant queries to comiple a research bundle for the user."
-            "If chatlog contains research snippets, evaluate them, find if they have missing information. If yes, reply with more research queries to"
-            " fill those gaps. Once all research have been received, compile all data into one single research bundle. Don't exclude any information",
+            "You are a deep research agent. Your task is to analyze the provided topic + research and generate relevant queries to build a comprehensive "
+            "research bundle for the user. Always ensure you have all the necessary information for the query; if not, iteratively use tool calls "
+            "until you do. Consider not only information directly related to the query but also any auxiliary details that might be relevant. "
+            "At the same time, don't include topics that are not relevant to the users query. "
+            "Like when asked about data engineering tools, Tools, langauges, frameworks are good topics. But open source vs closed source are irrelavant topics."
+            "Once all research data is collected, compile it into one complete research bundle without excluding any information.",
         ),
-        ("user", "Here is what to focus on the research: {topic}"),
         MessagesPlaceholder(variable_name="messages"),
     ]
 )

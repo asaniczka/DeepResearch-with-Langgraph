@@ -10,7 +10,6 @@ from wrapworks import cwdtoenv
 cwdtoenv()
 load_dotenv()
 
-from src.errors.main_errors import NoPageFetched
 from src.models.research_models import PageCrawlResult
 
 LOGGER = logging.getLogger(__name__)
@@ -20,7 +19,6 @@ LOGGER = logging.getLogger(__name__)
 def get_page(state: dict) -> dict:
 
     url = state["url"]
-    print(url)
     try:
         print(f"Getting {url} with JS Rendering")
         api_response = httpx.post(
@@ -40,6 +38,9 @@ def get_page(state: dict) -> dict:
         state["page"] = result.page
         return state
     except httpx.HTTPStatusError as e:
-
         LOGGER.error(f"Http status error {e.response.status_code}: {e.response.text}")
-        raise NoPageFetched("Unable to fetch page") from e
+        state["page"] = "Unable to fetch page"
+        return state
+    except Exception as e:
+        state["page"] = f"Unable to fetch page: type e {type(e)}: e {e}"
+        return state
