@@ -15,7 +15,7 @@ PYDANTIC_PARSER = PydanticToolsParser(tools=[ResearchExtentionTopics])
 
 
 CONTROLLER = "controller"
-RESEACH_CRAWLER = "research_crawller"
+RESEACH_CRAWLER = "research_crawler"
 
 
 def tool_executor(state: list[BaseMessage]) -> list:
@@ -45,7 +45,6 @@ BUILDER.add_node(CONTROLLER, RESEARCH_CONTROLLER_CHAIN)
 BUILDER.set_entry_point(CONTROLLER)
 BUILDER.add_conditional_edges(CONTROLLER, what_to_do)
 BUILDER.add_edge(RESEACH_CRAWLER, CONTROLLER)
-BUILDER.add_edge(CONTROLLER, END)
 
 GRAPH = BUILDER.compile()
 
