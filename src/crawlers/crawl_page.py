@@ -20,6 +20,7 @@ LOGGER = logging.getLogger(__name__)
 def get_page(state: dict) -> dict:
 
     url = state["url"]
+    print(url)
     try:
         print(f"Getting {url} with JS Rendering")
         api_response = httpx.post(
