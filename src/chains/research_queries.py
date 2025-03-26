@@ -2,7 +2,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, chain
 from langchain_core.runnables.passthrough import RunnablePick
 from langchain_openai import ChatOpenAI
-from rich import print
 from wrapworks import cwdtoenv
 
 cwdtoenv()
@@ -44,15 +43,12 @@ def get_research(summarization_target: str) -> str:
     queries = QUERY_GENERATOR_CHAIN.invoke(
         {"summarization_target": summarization_target}
     )
-    print(queries)
 
     serps = GET_SERP_CHAIN.batch(queries)
 
     page_urls = []
     for x in serps:
         page_urls.extend(x)
-
-    print(page_urls)
 
     summaries = PAGE_SUMMARY_CHAIN.batch(
         [{"url": x, "summarization_target": summarization_target} for x in page_urls]
