@@ -15,3 +15,7 @@ class PageCrawlResult(BaseModel):
 
 class SearchQueries(BaseModel):
     search_queries: list[str]
+
+
+class ResearchExtentionTopics(BaseModel):
+    topics_to_research: list[str]
