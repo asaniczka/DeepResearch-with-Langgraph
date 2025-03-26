@@ -26,7 +26,7 @@ DeepResearch with Langgraph is a proof-of-concept project that implements OpenAI
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/asaniczka/DeepResearch.git
+   git clone https://github.com/asaniczka/DeepResearch-with-Langgraph.git
    cd DeepResearch
    ```
 
