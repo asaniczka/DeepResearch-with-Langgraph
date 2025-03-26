@@ -11,6 +11,10 @@ DeepResearch with Langgraph is a proof-of-concept project that implements OpenAI
   - **OpenAI LLM:** To power the deep research with advanced language processing.
   - **Zyte.com:** For web crawling to fetch relevant information.
 
+## Graph Execution Diagram
+
+![Research Graph](resources/graphics/research_graph.png)
+
 ## Prerequisites
 
 - **Python 3:** Ensure Python 3 is installed on your machine.

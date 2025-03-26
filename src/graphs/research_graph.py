@@ -3,6 +3,7 @@ This module handles AI research interactions using a message graph.
 """
 
 import json
+import sys
 
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
@@ -79,8 +80,12 @@ GRAPH = BUILDER.compile()
 
 if __name__ == "__main__":
 
-    GRAPH.get_graph().draw_mermaid_png(
-        output_file_path="resources/graphics/research_graph.png"
-    )
-    r = GRAPH.invoke("Scala vs Java")
+    if len(sys.argv) > 1:
+        query = sys.argv[-1]
+    else:
+        query = "Scala vs Java"
+
+    print(f"Researching {query}")
+    r = GRAPH.invoke(query)
+
     print(AI_MESSAGE_TO_STR.invoke(r))
