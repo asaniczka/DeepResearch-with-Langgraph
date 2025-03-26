@@ -1,3 +1,7 @@
+"""
+This module handles AI research interactions using a message graph.
+"""
+
 import json
 
 from dotenv import load_dotenv
@@ -23,6 +27,15 @@ RESEACH_CRAWLER = "research_crawler"
 
 
 def tool_executor(state: list[BaseMessage]) -> ToolMessage:
+    """
+    Executes a tool based on the latest AI message in the given state.
+
+    Args:
+        state (list[BaseMessage]): A list of messages containing the AI's communication.
+
+    Returns:
+        ToolMessage: A message containing the research results and tool call ID.
+    """
     message: AIMessage = state[-1]
     parsed_message: ResearchExtentionTopics = PYDANTIC_PARSER.invoke(message)[0]
 
@@ -33,8 +46,18 @@ def tool_executor(state: list[BaseMessage]) -> ToolMessage:
 
 
 def what_to_do(state: list[BaseMessage]) -> str:
+    """
+    Determines the appropriate action to take based on the latest message in the state.
 
+    Args:
+      state (list[BaseMessage]): List of messages to analyze.
+
+    Returns:
+      str: Resulting action based on message parsing.
+    """
     last_message: AIMessage = state[-1]
+    # If there's a valid tool call, use RESEARCH CRAWLER.
+    # Else END
     try:
         parsed_message: ResearchExtentionTopics = PYDANTIC_PARSER.invoke(last_message)[
             0

@@ -1,3 +1,10 @@
+"""
+This module provides functionality for generating research queries,
+retrieving research data, and summarizing it.
+"""
+
+import sys
+
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, chain
 from langchain_core.runnables.passthrough import RunnablePick
@@ -39,7 +46,9 @@ GROUP_SUMMARY_CHAIN = SUMMERIZE_GROUP_PROMPT | LLM | StrOutputParser()
 
 @chain
 def get_research(summarization_target: str) -> str:
-
+    """
+    Retrieve and summarize research data based on a specified target. Handles errors during the process.
+    """
     try:
         queries = QUERY_GENERATOR_CHAIN.invoke(
             {"summarization_target": summarization_target}
@@ -68,4 +77,8 @@ def get_research(summarization_target: str) -> str:
 
 if __name__ == "__main__":
 
-    get_research.invoke("what is snowflake used for")
+    if sys.argv > 1:
+        query = sys.argv[0]
+    else:
+        query = "what is snowflake used for"
+    get_research.invoke(query)

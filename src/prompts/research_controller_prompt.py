@@ -1,3 +1,7 @@
+"""
+This module defines the RESEARCH_CONTROLLER_PROMPT for a deep research agent.
+"""
+
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 RESEARCH_CONTROLLER_PROMPT = ChatPromptTemplate.from_messages(

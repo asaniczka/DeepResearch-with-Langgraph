@@ -1,3 +1,7 @@
+"""
+This module fetches search engine results from Google.
+"""
+
 # pylint:disable=logging-fstring-interpolation
 import logging
 from urllib.parse import quote
@@ -16,7 +20,15 @@ LOGGER = logging.getLogger(__name__)
 
 @chain
 def get_serp(query: str) -> dict:
+    """
+    Fetches search engine results for a given query.
 
+    Args:
+        query (str): The search query string.
+
+    Returns:
+        dict: Parsed data from the search results page.
+    """
     base_url = "https://www.google.com/search?client=firefox-b-lm&channel=entpr&q="
     full_url = base_url + quote(query)
 

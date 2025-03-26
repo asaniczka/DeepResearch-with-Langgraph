@@ -1,3 +1,7 @@
+"""
+This module defines a prompt template for summarizing multiple agent summaries.
+"""
+
 from langchain.prompts import ChatPromptTemplate
 
 SUMMERIZE_GROUP_PROMPT = ChatPromptTemplate.from_messages(

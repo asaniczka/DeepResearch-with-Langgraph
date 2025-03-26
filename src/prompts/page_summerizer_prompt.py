@@ -1,3 +1,7 @@
+"""
+This module defines a prompt template for summarizing markdown pages.
+"""
+
 from langchain.prompts import ChatPromptTemplate
 
 SUMMERIZE_PAGE_PROMPT = ChatPromptTemplate.from_messages(

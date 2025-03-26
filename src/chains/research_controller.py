@@ -1,3 +1,7 @@
+"""
+This module integrates OpenAI with LangChain for research topic enhancement.
+"""
+
 from langchain_openai import ChatOpenAI
 
 from src.models.research_models import ResearchExtentionTopics

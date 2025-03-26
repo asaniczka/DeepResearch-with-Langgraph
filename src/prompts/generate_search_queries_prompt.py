@@ -1,3 +1,7 @@
+"""
+Generate search queries for Google based on user-defined goals.
+"""
+
 from langchain.prompts import ChatPromptTemplate
 
 SEARCH_QUERY_GENERATOR = ChatPromptTemplate.from_messages(

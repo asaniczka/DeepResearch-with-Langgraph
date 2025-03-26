@@ -17,7 +17,15 @@ LOGGER = logging.getLogger(__name__)
 
 @chain
 def get_page(state: dict) -> dict:
+    """
+    Fetches a web page using JavaScript rendering and updates the state with the page content.
 
+    Args:
+        state (dict): A dictionary containing the URL and state data.
+
+    Returns:
+        dict: Updated state with page content or an error message.
+    """
     url = state["url"]
     try:
         print(f"Getting {url} with JS Rendering")
