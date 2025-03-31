@@ -42,7 +42,7 @@ def tool_executor(state: list[BaseMessage]) -> ToolMessage:
 
     tool_call_id = message.additional_kwargs["tool_calls"][0]["id"]
 
-    researches = get_research.batch(parsed_message.new_topics_to_research)
+    researches = get_research.batch(parsed_message.query_for_crawler)
     return ToolMessage(content=json.dumps(researches), tool_call_id=tool_call_id)
 
 

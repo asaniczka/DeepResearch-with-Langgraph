@@ -51,7 +51,6 @@ class ResearchExtentionTopics(BaseModel):
 
     what_is_the_goal_of_the_user: str
     what_information_are_missing_in_bundle: str
-    new_topics_to_research: list[str] = Field(
-        description="Each topic is atomic. One research topic won't have access to other topics. Each item should contain all info related to that."
-        "Do not duplicate any previous tool call topics"
+    query_for_crawler: list[str] = Field(
+        description="Only a maximum of 1 item is supported"
     )
